@@ -1,0 +1,18 @@
+default: &default
+  adapter: sqlserver
+  host: localhost
+  username: sa
+  password: 12345
+  port: 1433
+
+development:
+  <<: *default
+  database: shopping_cart_api_development
+
+test:
+  <<: *default
+  database: shopping_cart_api_test
+
+production:
+  <<: *default
+  database: shopping_cart_api_production
