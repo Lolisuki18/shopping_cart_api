@@ -3,10 +3,10 @@ class Cart < ApplicationRecord
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
 
-  enum status: {active: 0, checked_out: 1}
+  enum :status, { active: 0, checked_out: 1 }
   #Lấy tổng tiền thời điểm hiện tại (tính theo giá sản phẩm hiển tại)
   def total_price
-    cart_items.include(:product).sum{ |ci| ci.quantity * ci.product.price}
+    cart_items.includes(:product).sum{ |ci| ci.quantity * ci.product.price}
   end
 
   #Thêm / tăng số lượng 1 sản phẩm vào giỏ
@@ -17,6 +17,17 @@ class Cart < ApplicationRecord
     item
   end
 
+  def set_product_quantity(product_id, quantity)
+    item = cart_items.find_or_initialize_by(product_id: product_id)
+    if quantity.to_i <= 0
+      item.destroy! if item.persisted?
+    else
+      item.quantity = quantity.to_i
+      item.save!
+    end
+    item
+  end
+  
   #Đổi số lượng 1 item 
   def set_item_quantity(product_id, qty)
     item = cart_items.find_by!(product_id: product_id)
